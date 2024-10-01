@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import '../LoginForm/LoginForm.css'
+import NavBar from '../NavBar/NavBar';
+import leftImage from '../../Assets/Images/yappervectors.png'; // Update the path to your image
+import { FaGoogle, FaFacebook } from 'react-icons/fa'; // Import icons
 
 function RegisterForm() {
     const [email, setEmail] = useState('');
@@ -36,36 +39,52 @@ function RegisterForm() {
     };
 
     return (
-        <div className='wrapper'>
-            <form onSubmit={handleSubmit}>
-                <h1>Register</h1>
-                <div className='input-box'>
-                    <input 
-                        type="text" 
-                        placeholder="Email" 
-                        required 
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <div className='input-box'>
-                    <input 
-                        type="password" 
-                        placeholder="Password" 
-                        required 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
+        <div className='LoginPage'>
+            <NavBar />
+            <div className='content'>
+                <img src={leftImage} alt="Description of image" className='left-image' />
+                
+                <div className='login-box'>
+                    <img src={require('../../Assets/Images/YapperLogo.png')} alt="Yapper Logo" className='logo' /> {/* Logo */}
+                    <h1>YAPPER</h1>
+                    
+                    <form onSubmit={handleSubmit}>
+                        <div className='input-box'>
+                            <input 
+                                type="text" 
+                                placeholder="Email" 
+                                required 
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </div>
+                        <div className='input-box'>
+                            <input 
+                                type="password" 
+                                placeholder="Password" 
+                                required 
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </div>
 
-                <button type="submit">Register</button>
+                        <button type="submit">Register</button>
 
-                {message && <p>{message}</p>}
+                        <div className='social-login'>
+                            <button className='google-button'>
+                                <FaGoogle className='icon' /> Sign up with Google
+                            </button>
+                            <button className='facebook-button'>
+                                <FaFacebook className='icon' /> Sign up with Facebook
+                            </button>
+                        </div>
 
-                <div className='register-link'>
-                    <p>Already have an account? <a href="/">Login</a></p>
+                        <div className='register-link'>
+                            <p>Already have an account? <a href="/login">Log in</a></p>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     );
 }

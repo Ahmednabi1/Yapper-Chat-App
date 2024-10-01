@@ -1,0 +1,66 @@
+/* General Navbar styling */
+.navbar {
+    position: fixed;  /* Ensure the navbar stays at the top */
+    top: 0;
+    left: 0;
+    width: 100vw;  /* Full viewport width */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #121212;
+    padding: 20px 40px;
+    z-index: 100; /* Ensure it's above other content */
+}
+
+/* Logo section */
+.navbar-logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    max-width: 80px;
+    max-height: 40px;
+    margin-right: 10px;
+}
+
+.navbar-logo h1 {
+    color: #C474FC;
+    font-size:35px;
+}
+
+/* Navbar links */
+.navbar-links {
+    display: flex;
+    list-style: none;
+    gap: 76px;
+}
+
+.navbar-links li {
+    display: inline;
+}
+
+.navbar-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: medium;
+}
+
+.navbar-links a:hover {
+    text-decoration: underline;
+}
+
+/* Login button styling */
+.login-btn {
+    padding: 10px 20px;
+    background-color: #A974FF;
+    color: white;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-btn:hover {
+    background-color: #8b62e0;
+}
