@@ -32,6 +32,15 @@ function LoginForm() {
         }
     }
 
+        const handleGoogleLogin = () => {
+            window.location.href = 'http://localhost:5000/api/auth/google';
+        };
+    
+        const handleFacebookLogin = () => {
+            window.location.href = 'http://localhost:5000/api/auth/facebook';
+        };
+
+
     return (
         <div className='LoginPage'>
             <NavBar />
@@ -65,10 +74,10 @@ function LoginForm() {
                         <button type="submit">Login</button>
 
                         <div className='social-login'>
-                            <button className='google-button'>
+                            <button className='google-button' onClick={handleGoogleLogin}>
                                 <FaGoogle className='icon' /> Log in with Google
                             </button>
-                            <button className='facebook-button'>
+                            <button className='facebook-button' onClick={handleFacebookLogin}>
                                 <FaFacebook className='icon' /> Log in with Facebook
                             </button>
                         </div>
