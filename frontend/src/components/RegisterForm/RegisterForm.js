@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../LoginForm/LoginForm.css'
 import NavBar from '../NavBar/NavBar';
 import leftImage from '../../Assets/Images/yappervectors.png'; // Update the path to your image
@@ -6,8 +7,9 @@ import { FaGoogle, FaFacebook } from 'react-icons/fa'; // Import icons
 
 function RegisterForm() {
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [password, setPassword] = useState(''); 
     const [message, setMessage] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,7 +29,7 @@ function RegisterForm() {
             if (response.ok) {
                 setMessage('Registration successful');
                 console.log('Registration successful');
-                // redirect to chat aw login
+                navigate('/login');
             } else {
                 setMessage(data.message || 'Registration failed');
                 console.error('Registration failed:', data);

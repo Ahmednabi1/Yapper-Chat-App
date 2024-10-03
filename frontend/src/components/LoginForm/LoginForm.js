@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './LoginForm.css';
 import NavBar from '../NavBar/NavBar';
 import leftImage from '../../Assets/Images/yappervectors.png'; // Update the path to your image
@@ -8,6 +9,7 @@ function LoginForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,19 +28,19 @@ function LoginForm() {
         if (response.ok) {
             localStorage.setItem('token', data.token);
             console.log('Login successful');
-            // Redirect to chat
+            navigate('/chat');
         } else {
             setErrorMessage(data.message || 'Login failed');
         }
     }
 
-        const handleGoogleLogin = () => {
-            window.location.href = 'http://localhost:5000/api/auth/google';
-        };
-    
-        const handleFacebookLogin = () => {
-            window.location.href = 'http://localhost:5000/api/auth/facebook';
-        };
+    const handleGoogleLogin = () => {
+        window.location.href = 'http://localhost:5000/api/auth/google';
+    };
+
+    const handleFacebookLogin = () => {
+        window.location.href = 'http://localhost:5000/api/auth/facebook';
+    };
 
 
     return (

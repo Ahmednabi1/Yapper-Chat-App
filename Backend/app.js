@@ -10,11 +10,15 @@ const connectDB = require("./config/database");
 const passport = require("./config/passport");
 const authRoutes = require("./routes/auth");
 const socketController = require("./controllers/socketController");
-const corsMiddleware = require("./middleware/corsMiddleware");
+const corsMiddleware = require("./middleware/corsMiddleware")
 
 dotenv.config();
 const app = express();
 const server = http.createServer(app);
+
+connectDB();
+
+app.use(cors());
 
 app.use(express.json());
 app.use(express.static("public"));
