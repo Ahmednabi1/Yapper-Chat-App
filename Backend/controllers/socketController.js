@@ -11,16 +11,23 @@ const socketController = (server) => {
 
   io.on("connection", (socket) => {
     console.log("a user connected:", socket.id);
-
-    // Listen for 'chat message' events
-    socket.on("chat message", (msg) => {
-      console.log("message: " + msg);
-
-      // Broadcast the message to all connected clients
-      io.emit("chat message", msg);
+    socket.on("create-room", (room, id) => {
+      socket.join(room);
+      console.log(`Room ${room} was created by socket ${id}`);
+      io.to(room).emit("room-created", `room ${room} was created`);
     });
 
-    // Handle user disconnection
+    socket.on("join-room", (room, id) => {
+      socket.join(room);
+      console.log(`user ${id} has joined room ${room}`);
+      io.to(room).emit("join-room", room, id);
+    });
+
+    socket.on("chat message", (msg, room, id) => {
+      console.log("message: " + msg + "to: " + room + "by: " + socket.id);
+      io.to(room).emit("chat message", msg, id);
+    });
+
     socket.on("disconnect", () => {
       console.log("user disconnected:", socket.id);
     });

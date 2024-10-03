@@ -6,30 +6,49 @@ import io from "socket.io-client";
 const socket = io("http://localhost:5000");
 
 function ChatRooms() {
-  const [message, setMessage] = useState(""); // Updated casing for consistency
+  const [id, setId] = useState("");
+  const [room, setRoom] = useState("");
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-
   useEffect(() => {
-    // Listen for incoming chat messages
-    socket.on("chat message", (msg) => {
-      setMessages((prevMessages) => [...prevMessages, msg]); // Use functional update
+    // Listen for room creation and joining events
+    socket.on("room-created", (data) => {
+      console.log(data);
     });
 
-    // Cleanup function to remove the event listener
+    socket.on("room-joined", (data) => {
+      console.log(data);
+    });
+
+    // Listening for incoming messages
+    socket.on("chat message", (msg, id) => {
+      setMessages([...messages, id + ": " + msg]);
+    });
+
     return () => {
       socket.off("chat message");
     };
-  }, []);
+  }, [messages]);
 
-  // Function to send a message
   const sendMessage = (e) => {
     e.preventDefault();
     if (message.trim()) {
-      socket.emit("chat message", message);
-      setMessage(""); // Clear input after sending
+      socket.emit("chat message", message, room, id); // Send message to backend
+      setMessage("");
     }
   };
 
+  const HandleInputValue = (e) => {
+    setRoom(e.target.value);
+  };
+  const CreateRoom = () => {
+    setId("1");
+    socket.emit("create-room", room, id);
+  };
+  const JoinRoom = () => {
+    setId("1");
+    socket.emit("join-room", room, id);
+  };
   return (
     <div className="chat-container">
       <div className="sidebar">
@@ -50,7 +69,18 @@ function ChatRooms() {
           ))}
         </div>
       </div>
-
+      <div // div for createroom and join room
+      >
+        <button onClick={CreateRoom}>CreateRoomBtn</button>
+        <input
+          type="text"
+          placeholder="enter room id"
+          value={room}
+          onChange={HandleInputValue}
+        ></input>
+        <button onClick={JoinRoom}>join Room</button>
+        <div></div>
+      </div>
       <form className="message-form" onSubmit={sendMessage}>
         <input
           value={message}
