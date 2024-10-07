@@ -1,94 +1,97 @@
 import React, { useState, useEffect } from "react";
-import "./ChatRooms.css"; // Ensure the CSS file is also renamed to ChatRooms.css
+import "./ChatRooms.css";
+import "./bootstrap.min.css";
 import io from "socket.io-client";
-
-// Connect to the Socket.IO server
-const socket = io("http://localhost:5000");
+import { useNavigate } from "react-router-dom";
 
 function ChatRooms() {
-  const [id, setId] = useState("");
-  const [room, setRoom] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [selectedRoom, setRoom] = useState("");
+  const [namespaceSocket, setnamespaceSocket] = useState("");
+  const rooms = ["one", "two", "three"];
+  const navigate = useNavigate();
   useEffect(() => {
-    // Listen for room creation and joining events
-    socket.on("room-created", (data) => {
-      console.log(data);
-    });
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    } else if (selectedRoom) {
+      const newnamespaceSocket = io(
+        `http://localhost:5000/chat/${selectedRoom}`,
+        { auth: { token: localStorage.getItem("token") } }
+      );
 
-    socket.on("room-joined", (data) => {
-      console.log(data);
-    });
-
-    // Listening for incoming messages
-    socket.on("chat message", (msg, id) => {
-      setMessages([...messages, id + ": " + msg]);
-    });
-
-    return () => {
-      socket.off("chat message");
-    };
-  }, [messages]);
+      // Listening for incoming messages
+      newnamespaceSocket.on("chat message", (data) => {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          `${data.from} : ${data.message}`,
+        ]);
+      });
+      setnamespaceSocket(newnamespaceSocket);
+      return () => {
+        newnamespaceSocket.disconnect();
+        setMessages([]);
+      };
+    }
+  }, [selectedRoom]);
 
   const sendMessage = (e) => {
     e.preventDefault();
-    if (message.trim()) {
-      socket.emit("chat message", message, room, id); // Send message to backend
+    if (message.trim() && namespaceSocket) {
+      namespaceSocket.emit("chat message", message); // Send message to backend
       setMessage("");
     }
   };
 
-  const HandleInputValue = (e) => {
-    setRoom(e.target.value);
-  };
-  const CreateRoom = () => {
-    setId("1");
-    socket.emit("create-room", room, id);
-  };
-  const JoinRoom = () => {
-    setId("1");
-    socket.emit("join-room", room, id);
-  };
   return (
-    <div className="chat-container">
-      <div className="sidebar">
+    <div className="chat-container row-2">
+      <div className="sidebar coloumn-1">
         <h2>Chats</h2>
+
         <ul>
-          <li>user1</li>
-          <li>user2</li>
-          <li>user3</li>
-          <li>user4</li>
+          {rooms.map((room, index) => (
+            <li key={index}>
+              <a
+                href="#"
+                onClick={() => {
+                  setRoom(room);
+                  setMessages([]);
+                }}
+                className=""
+              >
+                {room}
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
-      <div className="chat-area">
-        <div className="chat-messages">
-          {messages.map((msg, index) => (
-            <div key={index} className="chat-message">
-              <p>{msg}</p>
+      <div className="chat-area" coloumn-2>
+        {selectedRoom ? (
+          <>
+            <h3>Room:{selectedRoom}</h3>
+            <div className="chat-messages">
+              {messages.map((msg, index) => (
+                <div key={index} className="chat-message">
+                  <p>{msg}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+            <form className="message-form coloumn" onSubmit={sendMessage}>
+              <input
+                value={message}
+                onChange={(e) => setMessage(e.target.value)} // Updated casing for consistency
+                placeholder="Type your message......."
+              />
+              <button type="submit">Send</button>
+            </form>
+          </>
+        ) : (
+          <>
+            <p>please select a chatroom to start yapping</p>
+          </>
+        )}
       </div>
-      <div // div for createroom and join room
-      >
-        <button onClick={CreateRoom}>CreateRoomBtn</button>
-        <input
-          type="text"
-          placeholder="enter room id"
-          value={room}
-          onChange={HandleInputValue}
-        ></input>
-        <button onClick={JoinRoom}>join Room</button>
-        <div></div>
-      </div>
-      <form className="message-form" onSubmit={sendMessage}>
-        <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)} // Updated casing for consistency
-          placeholder="Type your message......"
-        />
-        <button type="submit">Send</button>
-      </form>
     </div>
   );
 }

@@ -2,7 +2,12 @@ import React from "react";
 import LoginForm from "./components/LoginForm/LoginForm";
 import RegisterForm from "./components/RegisterForm/RegisterForm";
 import ChatRooms from "./components/ChatRooms/ChatRooms";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import ProfileForm from "./components/Profile/porfile";
 
 function App() {
