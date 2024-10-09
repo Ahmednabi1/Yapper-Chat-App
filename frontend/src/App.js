@@ -2,6 +2,7 @@ import React from "react";
 import LoginForm from "./components/LoginForm/LoginForm";
 import RegisterForm from "./components/RegisterForm/RegisterForm";
 import ChatRooms from "./components/ChatRooms/ChatRooms";
+
 import {
   BrowserRouter as Router,
   Route,
@@ -9,6 +10,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import ProfileForm from "./components/Profile/porfile";
+import CreateRoom from "./components/CreateRoom/CreateRoom";
 
 function App() {
   return (
@@ -22,6 +24,7 @@ function App() {
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/chat" element={<ChatRooms />} />
           <Route path="/profile" element={<ProfileForm />} />
+          <Route path="/createroom" element={<CreateRoom />} />
         </Routes>
       </div>
     </Router>

@@ -58,7 +58,7 @@ body {
 
         .chat-messages {
                 padding: 20px;
-                flex: 1;
+                /* flex: 1; */
                 overflow-y: scroll;
                 background-color: #ececec;
                 margin-bottom: 60px;

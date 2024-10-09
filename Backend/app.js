@@ -9,8 +9,9 @@ const cors = require("cors");
 const connectDB = require("./config/database");
 const passport = require("./config/passport");
 const authRoutes = require("./routes/auth");
+const roomRoutes = require("./routes/room");
 const socketController = require("./controllers/socketController");
-const corsMiddleware = require("./middleware/corsMiddleware")
+const corsMiddleware = require("./middleware/corsMiddleware");
 
 dotenv.config();
 const app = express();
@@ -38,6 +39,7 @@ app.use(
 
 app.use(passport.initialize());
 app.use("/api/auth", authRoutes);
+app.use("/api", roomRoutes);
 app.get("");
 
 socketController(server);

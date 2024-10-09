@@ -49,4 +49,9 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const logout = async (req, res) => {
+  res.status(200).json({ message: "logged out successfully" });
+  res.token.destroy();
+};
+
+module.exports = { register, login, logout };
