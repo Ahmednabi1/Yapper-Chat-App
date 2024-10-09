@@ -1,6 +1,6 @@
 const express = require("express");
 const Room = require("../models/Rooms");
-
+ 
 const fetchRooms = async (req, res) => {
   try {
     const rooms = await Room.find();

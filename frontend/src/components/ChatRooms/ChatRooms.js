@@ -5,20 +5,22 @@ import io from "socket.io-client";
 import CreateRoom from "../CreateRoom/CreateRoom";
 import { useNavigate } from "react-router-dom";
 
-function ChatRooms() {
+function ChatRooms() { 
   const [isvisible, Setisvisible] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [selectedRoom, setRoom] = useState("");
+  const [selectedRoom, setRoom] = useState(""); 
   const [namespaceSocket, setnamespaceSocket] = useState("");
   const [rooms, setRooms] = useState([]);
 
   const navigate = useNavigate();
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
     } else if (selectedRoom) {
+      // fetchMessages(selectedRoom);
       const newnamespaceSocket = io(
         `http://localhost:5000/chat/${selectedRoom}`,
         { auth: { token: localStorage.getItem("token") } }
@@ -38,6 +40,23 @@ function ChatRooms() {
       };
     }
   }, [selectedRoom]);
+
+  // fetch old messages from db
+  const fetchMessages = async (roomId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/rooms/${roomId}/messages`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const data = await response.json();
+      console.log("room id: ", roomId);
+      setMessages(data); // set the fetched messages
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
 
   useEffect(() => {
     fetchrooms();
@@ -92,7 +111,7 @@ function ChatRooms() {
 
   return (
     <div className="chat-container">
-      <input type="button" onClick={handlelogout} />
+      <input value="log out" type="button" onClick={handlelogout} />
 
       <div className="sidebar">
         <h2>Chats</h2>
@@ -117,9 +136,14 @@ function ChatRooms() {
             <li key={room._id}>
               <a
                 href="#"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault(); // Prevent default anchor behavior
                   setRoom(room.roomName);
-                  setMessages([]);
+                  //setMessages([]);
+                  console.log( "room id: ", room._id)
+                  fetchMessages(room._id);
+
+          
                 }}
                 className=""
               >
@@ -129,14 +153,18 @@ function ChatRooms() {
           ))}
         </ul>
       </div>
-      <div className="chat-area" coloumn-2>
+      <div className="chat-area coloumn-2">
         {selectedRoom ? (
           <>
             <h3>Room:{selectedRoom}</h3>
             <div className="chat-messages">
               {messages.map((msg, index) => (
-                <div key={index} className="chat-message">
-                  <p>{msg}</p>
+                <div key={msg._id} className="chat-message">
+                  <p>{msg.sender}: </p>
+                  <p>{msg.message}</p>
+                  <p>
+                      time: {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
                 </div>
               ))}
             </div>

@@ -8,7 +8,7 @@ const RoomSchema = new mongoose.Schema({
   protection: {
     type: Boolean,
     default: false,
-  },
+  }, 
   password: {
     type: String,
   },

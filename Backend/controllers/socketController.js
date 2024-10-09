@@ -1,9 +1,12 @@
 const { Server } = require("socket.io");
 const express = require("express");
-const app = express();
+const app = express(); 
 const auth = require("../middleware/authMiddleware");
 const jwt = require("jsonwebtoken");
 const Room = require("../models/Rooms");
+const Message = require('../models/Messages'); 
+
+
 const socketController = (server) => {
   // Create a new instance of Socket.IO
   const io = new Server(server, {
@@ -42,13 +45,25 @@ const socketController = (server) => {
             ` to : ${room.roomName}`
         );
 
-        socket.on("chat message", (msg) => {
+        socket.on("chat message", async (msg) => {
           let data = {
             from: socket.user.Uname,
             message: msg,
           };
           console.log("message: " + msg + "by: " + socket.user.Uname);
           ns.emit("chat message", data);
+
+          // save message in database
+          try {
+            await Message.create({
+                chatroom: room._id,
+                sender: socket.user.Uname,
+                message: msg
+            });
+            console.log(msg, " Message saved to MongoDB");
+        } catch (error) {
+            console.error("Error saving message to MongoDB:", error.message);
+        }
         });
 
         socket.on("disconnect", () => {

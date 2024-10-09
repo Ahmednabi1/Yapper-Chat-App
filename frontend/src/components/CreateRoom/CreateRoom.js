@@ -14,7 +14,7 @@ function CreateRoom({ onRoomCreated }) {
         "content-type": "application/json",
       },
       body: JSON.stringify(RoomData),
-    });
+    }); 
     if (response.ok) {
       console.log("Room Created");
       onRoomCreated();
