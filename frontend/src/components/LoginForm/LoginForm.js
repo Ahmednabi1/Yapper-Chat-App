@@ -6,7 +6,7 @@ import leftImage from '../../Assets/Images/yappervectors.png'; // Update the pat
 import { FaGoogle, FaFacebook } from 'react-icons/fa'; // Import icons
 
 function LoginForm() {
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState(''); 
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
@@ -27,7 +27,6 @@ function LoginForm() {
 
         if (response.ok) {
             localStorage.setItem('token', data.token);
-            console.log('Login successful');
             navigate('/chat');
         } else {
             setErrorMessage(data.message || 'Login failed');

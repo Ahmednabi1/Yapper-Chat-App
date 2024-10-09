@@ -2,7 +2,7 @@ import React from 'react';
 import './NavBar.css';
 import logo from '../../Assets/Images/YapperLogo.png'; // Adjust the path if necessary
 
-function NavBar() {
+function NavBar() { 
     return (
         <nav className="navbar">
             <div className="navbar-logo">

@@ -1,4 +1,5 @@
 /* General Navbar styling */
+
 .navbar {
     position: fixed;  /* Ensure the navbar stays at the top */
     top: 0;
@@ -16,6 +17,7 @@
 .navbar-logo {
     display: flex;
     align-items: center;
+    margin: 1% 0 1% 4%;
 }
 
 .logo-img {
@@ -34,6 +36,7 @@
     display: flex;
     list-style: none;
     gap: 76px;
+    margin: 1% 4% 1% 0%;
 }
 
 .navbar-links li {

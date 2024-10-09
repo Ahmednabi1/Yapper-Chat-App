@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./ChatRooms.css";
-import "./bootstrap.min.css";
+import "./bootstrap.min.css"
 import io from "socket.io-client";
 import CreateRoom from "../CreateRoom/CreateRoom";
 import { useNavigate } from "react-router-dom";

@@ -1,3 +1,9 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x:hidden;
+}
+
 .LoginPage {
     display: flex;
     flex-direction: column;
@@ -5,21 +11,22 @@
     background-color: #1A191D; /* Updated background color */
     color: white; /* White text */
     height: 100vh; /* Full height */
+    width: 100vw;
     margin: 0; /* Ensure no margin */
-    padding: 0; /* Ensure no padding */
+    padding: 0 3%; /* Ensure no padding */
 }
 
 .content {
     display: flex;
     gap: 250px;
-    width: 100%; /* Full width */
+    max-width: 100%; /* Full width */
     margin: auto; /* Centering content */
     align-items: center;
 }
 
 .left-image {
     margin-top: 100px;
-    width: 800px; /* Adjust the width of the left image */
+    width: 45vw; /* Adjust the width of the left image */
     height: auto;
 }
 
@@ -28,9 +35,10 @@
     border-radius: 10px; /* Rounded corners */
     padding: 30px;
     width: 550px; /* Adjust the width */
-    height: 500px;
+    height: 550px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Shadow for depth */
     text-align: center; /* Center text */
+    margin-right: 20px;
 }
 .login-box h1{
     color: #C474FC;
