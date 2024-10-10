@@ -20,7 +20,6 @@ function ChatRooms() {
     if (!token) {
       navigate("/login");
     } else if (selectedRoom) {
-      // fetchMessages(selectedRoom);
       const newnamespaceSocket = io(
         `http://localhost:5000/chat/${selectedRoom}`,
         { auth: { token: localStorage.getItem("token") } }
@@ -30,7 +29,10 @@ function ChatRooms() {
       newnamespaceSocket.on("chat message", (data) => {
         setMessages((prevMessages) => [
           ...prevMessages,
-          `${data.from} : ${data.message}`,
+          {
+            sender: data.from,
+            message: data.message
+          }
         ]);
       });
       setnamespaceSocket(newnamespaceSocket);
@@ -137,13 +139,9 @@ function ChatRooms() {
               <a
                 href="#"
                 onClick={(e) => {
-                  e.preventDefault(); // Prevent default anchor behavior
+                  e.preventDefault(); 
                   setRoom(room.roomName);
-                  //setMessages([]);
-                  console.log( "room id: ", room._id)
                   fetchMessages(room._id);
-
-          
                 }}
                 className=""
               >
@@ -158,15 +156,20 @@ function ChatRooms() {
           <>
             <h3>Room:{selectedRoom}</h3>
             <div className="chat-messages">
-              {messages.map((msg, index) => (
-                <div key={msg._id} className="chat-message">
-                  <p>{msg.sender}: </p>
-                  <p>{msg.message}</p>
-                  <p>
-                      time: {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
-              ))}
+            {messages.map((msg, index) => { // ensure msg not empty
+              if (msg.sender && msg.message) {
+                
+                return (
+                  <div key={msg._id} className="chat-message">
+                    <p>
+                      {msg.sender} : {msg.message} 
+                    </p>
+                  </div>
+                );
+              }
+              return null; // dont display empty message
+            })}
+
             </div>
             <form className="message-form coloumn" onSubmit={sendMessage}>
               <input
