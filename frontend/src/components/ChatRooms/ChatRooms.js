@@ -20,26 +20,47 @@ function ChatRooms() {
     if (!token) {
       navigate("/login");
     } else if (selectedRoom) {
-      const newnamespaceSocket = io(
-        `http://localhost:5000/chat/${selectedRoom}`,
-        { auth: { token: localStorage.getItem("token") } }
-      );
+      let newnamespaceSocket;
+      if (!selectedRoom.protection) // if no password
+      {
+        newnamespaceSocket = io(
+          `http://localhost:5000/chat/${selectedRoom.roomName}`,
+          { auth: { token: localStorage.getItem("token") } }
+        );
+      }
+      else 
+      {
+        let pass = prompt("Enter Room Password");
+        if (selectedRoom.password === pass) {
+          newnamespaceSocket = io(
+            `http://localhost:5000/chat/${selectedRoom.roomName}`,
+            { auth: { token: localStorage.getItem("token") } }
+          );
+        } 
+        else 
+        {
+          alert("Wrong password! Please try again.");
+          setRoom("");
+        }
+      }
 
       // Listening for incoming messages
-      newnamespaceSocket.on("chat message", (data) => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            sender: data.from,
-            message: data.message
-          }
-        ]);
-      });
-      setnamespaceSocket(newnamespaceSocket);
-      return () => {
-        newnamespaceSocket.disconnect();
-        setMessages([]);
+      if (newnamespaceSocket) {
+        newnamespaceSocket.on("chat message", (data) => {
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+              sender: data.from,
+              message: data.message
+            }
+          ]);
+        });
+        setnamespaceSocket(newnamespaceSocket);
+        return () => {
+          newnamespaceSocket.disconnect();
+          setMessages([]);
       };
+      }
     }
   }, [selectedRoom]);
 
@@ -78,6 +99,7 @@ function ChatRooms() {
       console.error("Error fetching rooms:", error);
     }
   };
+
   const sendMessage = (e) => {
     e.preventDefault();
     if (message.trim() && namespaceSocket) {
@@ -85,6 +107,7 @@ function ChatRooms() {
       setMessage("");
     }
   };
+
   const handlelogout = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/auth/logout", {
@@ -102,6 +125,7 @@ function ChatRooms() {
       console.error("error logging out:", error);
     }
   };
+  
   const handleRoomCreated = () => {
     Setisvisible(false);
     fetchrooms();
@@ -140,7 +164,7 @@ function ChatRooms() {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault(); 
-                  setRoom(room.roomName);
+                  setRoom(room);
                   fetchMessages(room._id);
                 }}
                 className=""
@@ -154,7 +178,7 @@ function ChatRooms() {
       <div className="chat-area coloumn-2">
         {selectedRoom ? (
           <>
-            <h3>Room:{selectedRoom}</h3>
+            <h3>Room:{selectedRoom.roomName}</h3>
             <div className="chat-messages">
             {messages.map((msg, index) => { // ensure msg not empty
               if (msg.sender && msg.message) {
