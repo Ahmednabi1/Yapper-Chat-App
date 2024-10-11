@@ -1,57 +1,73 @@
 import React, { useState, useEffect } from "react";
 import "./ChatRooms.css";
-import "./bootstrap.min.css"
+import "./bootstrap.min.css";
 import io from "socket.io-client";
 import CreateRoom from "../CreateRoom/CreateRoom";
 import { useNavigate } from "react-router-dom";
 
-function ChatRooms() { 
+function ChatRooms() {
   const [isvisible, Setisvisible] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [selectedRoom, setRoom] = useState(""); 
+  const [selectedRoom, setRoom] = useState("");
   const [namespaceSocket, setnamespaceSocket] = useState("");
   const [rooms, setRooms] = useState([]);
 
   const navigate = useNavigate();
+  const roomjoin = () => {
+    const newnamespaceSocket = io(
+      `http://localhost:5000/chat/${selectedRoom.roomName}`,
+      { auth: { token: localStorage.getItem("token") } }
+    );
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    } else if (selectedRoom) {
-      const newnamespaceSocket = io(
-        `http://localhost:5000/chat/${selectedRoom}`,
-        { auth: { token: localStorage.getItem("token") } }
-      );
+    // Listening for incoming messages
+    newnamespaceSocket.on("chat message", (data) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          sender: data.from,
+          message: data.message,
+        },
+      ]);
 
-      // Listening for incoming messages
-      newnamespaceSocket.on("chat message", (data) => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            sender: data.from,
-            message: data.message
-          }
-        ]);
-      });
       setnamespaceSocket(newnamespaceSocket);
       return () => {
         newnamespaceSocket.disconnect();
         setMessages([]);
       };
+    });
+  };
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    } else if (selectedRoom) {
+      if (!selectedRoom.protection) {
+        roomjoin();
+      } else {
+        let pass = prompt("Enter Room Password");
+        if (selectedRoom.password == pass) {
+          roomjoin();
+        } else {
+          alert("Wrong password! , try joinning again");
+          navigate("/chat");
+        }
+      }
     }
   }, [selectedRoom]);
 
   // fetch old messages from db
   const fetchMessages = async (roomId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/rooms/${roomId}/messages`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/rooms/${roomId}/messages`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       const data = await response.json();
       console.log("room id: ", roomId);
       setMessages(data); // set the fetched messages
@@ -139,8 +155,8 @@ function ChatRooms() {
               <a
                 href="#"
                 onClick={(e) => {
-                  e.preventDefault(); 
-                  setRoom(room.roomName);
+                  e.preventDefault();
+                  setRoom(room);
                   fetchMessages(room._id);
                 }}
                 className=""
@@ -154,22 +170,21 @@ function ChatRooms() {
       <div className="chat-area coloumn-2">
         {selectedRoom ? (
           <>
-            <h3>Room:{selectedRoom}</h3>
+            <h3>Room:{selectedRoom.roomName}</h3>
             <div className="chat-messages">
-            {messages.map((msg, index) => { // ensure msg not empty
-              if (msg.sender && msg.message) {
-                
-                return (
-                  <div key={msg._id} className="chat-message">
-                    <p>
-                      {msg.sender} : {msg.message} 
-                    </p>
-                  </div>
-                );
-              }
-              return null; // dont display empty message
-            })}
-
+              {messages.map((msg, index) => {
+                // ensure msg not empty
+                if (msg.sender && msg.message) {
+                  return (
+                    <div key={msg._id} className="chat-message">
+                      <p>
+                        {msg.sender} : {msg.message}
+                      </p>
+                    </div>
+                  );
+                }
+                return null; // dont display empty message
+              })}
             </div>
             <form className="message-form coloumn" onSubmit={sendMessage}>
               <input
