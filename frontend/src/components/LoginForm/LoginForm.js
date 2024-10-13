@@ -27,6 +27,7 @@ function LoginForm() {
 
         if (response.ok) {
             localStorage.setItem('token', data.token);
+            
             navigate('/chat');
         } else {
             setErrorMessage(data.message || 'Login failed');

@@ -8,12 +8,10 @@ body, html {
 .chat-container {
     display: flex;
     height: 100vh;
+    width: 100vw;
 }
 
 .sidebar{
-    /* width: 25%;
-    /* display: flex; */
-    /* flex-direction: column; */
     padding: 20px;
     font-size: 20px;
     background-color: white;
@@ -45,19 +43,16 @@ body, html {
 
 .chat-area{
     position: relative;
-    width: 75%;
-    /* display: flex; */
-    /* flex-direction: column; */
+    width: 100%;
     justify-content: space-between;
     background-color: white;
 }
 
 .chat-messages {
         padding: 20px;
-        /* flex: 1; */
         overflow-y: scroll;
         background-color: #ececec;
-        margin-bottom: 60px;
+        padding-bottom: 70px;
     }
 .chat-message {
     margin-bottom: 10px;
@@ -68,6 +63,28 @@ body, html {
     word-wrap: break-word;
 }
 
+.my-message {
+    background-color: #c0c0c0;
+    align-self: flex-start;
+    margin-right: auto; /* Pushes to the left side */
+}
+
+.other-message {
+    background-color: #e0e0e0;
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+.server-message {
+    background-color: transparent;
+    align-self:center;
+    margin: auto;
+    color: rgb(95, 95, 95);
+    width: fit-content;
+    font-size: 14px;
+}
+
+/*
 .chat-message:nth-child(odd) {
     background-color: #e0e0e0;
 }
@@ -75,12 +92,11 @@ body, html {
 .chat-message:nth-child(even) {
     background-color: #c0c0c0;
     align-self: flex-end;
-}
+}*/
 
 
 .message-form{
     width: 75%;
-    
     position: fixed;
     bottom: 0px;
     display: flex;
@@ -90,7 +106,6 @@ body, html {
 }
 
 .message-form input {
-    /* flex: 1; */
     padding: 10px;
     border: none;
     border-radius: 10px;

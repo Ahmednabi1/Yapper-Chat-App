@@ -4,6 +4,7 @@ import "./bootstrap.min.css"
 import io from "socket.io-client";
 import CreateRoom from "../CreateRoom/CreateRoom";
 import { useNavigate } from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 
 function ChatRooms() { 
   const [isvisible, Setisvisible] = useState(false);
@@ -109,9 +110,9 @@ function ChatRooms() {
   };
 
   const handlelogout = async () => {
-    try {
+    try { 
       const response = await fetch("http://localhost:5000/api/auth/logout", {
-        method: "POST",
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -125,20 +126,47 @@ function ChatRooms() {
       console.error("error logging out:", error);
     }
   };
+
+  const handleDeleteAccount = async () => {
+    const token = localStorage.getItem('token'); // Assuming you have the token saved in localStorage
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/deleteAccount', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        window.location.href = '/login';
+        alert(data.message);
+        localStorage.removeItem('token'); // remove token from localStorage
+      } 
+      else {
+        alert(data.message || 'Failed to delete account');
+      }
+    } 
+    catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    }
+};
+
   
   const handleRoomCreated = () => {
     Setisvisible(false);
     fetchrooms();
-  };
+  }; 
 
   const togglevisable = () => {
     Setisvisible(!isvisible);
   };
 
+
   return (
     <div className="chat-container">
-      <input value="log out" type="button" onClick={handlelogout} />
-
       <div className="sidebar">
         <h2>Chats</h2>
         <div className="Create-room">
@@ -174,17 +202,31 @@ function ChatRooms() {
             </li>
           ))}
         </ul>
+
+        <input value="delete acc" type="button" onClick={handleDeleteAccount } />
+        <input value="log out" type="button" onClick={handlelogout} />
       </div>
       <div className="chat-area coloumn-2">
         {selectedRoom ? (
           <>
             <h3>Room:{selectedRoom.roomName}</h3>
             <div className="chat-messages">
-            {messages.map((msg, index) => { // ensure msg not empty
-              if (msg.sender && msg.message) {
-                
+            {messages.map((msg, index) => { 
+              if (msg.sender && msg.message) { // ensure msg not empty
+                // get current user for msg colors
+                const token = localStorage.getItem('token');
+                let currentUser;
+                if (token) {
+                    const decodedToken = jwtDecode(token);
+                    currentUser = decodedToken.Uname;
+                }
+                let messageClass;
+                if (msg.sender === currentUser) { messageClass = "my-message"; } 
+                else if (msg.sender === "server") { messageClass = "server-message"; } 
+                else { messageClass = "other-message"; }
+
                 return (
-                  <div key={msg._id} className="chat-message">
+                  <div key={msg._id} className={`chat-message ${messageClass}`} >
                     <p>
                       {msg.sender} : {msg.message} 
                     </p>

@@ -1,6 +1,7 @@
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcryptjs"); 
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const Message = require("../models/Messages");
 
 const generateAccessToken = (Uname) => {
   return jwt.sign({ Uname }, process.env.JWT_SECRET, { expiresIn: "1h" });
@@ -51,7 +52,26 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   res.status(200).json({ message: "logged out successfully" });
-  res.token.destroy();
 };
 
-module.exports = { register, login, logout };
+
+const deleteAccount = async (req, res) => {
+  try {
+    const userEmail = req.user.Uname;
+    const deletedUser = await User.findOneAndDelete({ email: userEmail });
+    
+    if (!deletedUser) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+
+    // delete messages sent by user
+    await Message.deleteMany({ sender: userEmail });
+    
+    res.status(200).json({ message: 'Account successfully deleted' });
+  } catch (error) {
+      console.error("Error deleting account:", error);
+      res.status(500).json({ message: 'Error deleting account', error });
+  }
+};
+
+module.exports = { register, login, logout, deleteAccount };
