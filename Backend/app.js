@@ -13,6 +13,10 @@ const roomRoutes = require("./routes/room");
 const messageRoutes = require('./routes/messages'); 
 const socketController = require("./controllers/socketController");
 const corsMiddleware = require("./middleware/corsMiddleware");
+const profileController = require("./controllers/profileController");
+const profileRoutes = require('./routes/profile'); 
+
+
 
 
 dotenv.config();
@@ -43,6 +47,7 @@ app.use(passport.initialize());
 app.use("/api/auth", authRoutes);
 app.use("/api", roomRoutes);
 app.use("/api", messageRoutes);
+app.use('/api/profile', profileRoutes);
 
 app.get("");
 
