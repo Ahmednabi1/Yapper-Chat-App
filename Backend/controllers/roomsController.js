@@ -1,6 +1,6 @@
 const express = require("express");
 const Room = require("../models/Rooms");
- 
+const eventEmitter = require("../controllers/eventsHandling");
 const fetchRooms = async (req, res) => {
   try {
     const rooms = await Room.find();
@@ -22,8 +22,7 @@ const CreateRoom = async (req, res) => {
       password: protection ? password : null,
     });
     await newRoom.save();
-
-    
+    eventEmitter.emit("RoomCreated", newRoom);
     res.status(201).json(newRoom);
   } catch (error) {
     console.error("Error creating room:", error.message);

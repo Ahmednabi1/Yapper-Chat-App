@@ -10,10 +10,9 @@ const connectDB = require("./config/database");
 const passport = require("./config/passport");
 const authRoutes = require("./routes/auth");
 const roomRoutes = require("./routes/room");
-const messageRoutes = require('./routes/messages'); 
+const messageRoutes = require("./routes/messages");
 const socketController = require("./controllers/socketController");
 const corsMiddleware = require("./middleware/corsMiddleware");
-
 
 dotenv.config();
 const app = express();

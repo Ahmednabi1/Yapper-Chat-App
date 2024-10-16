@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "./ChatRooms.css";
-import "./bootstrap.min.css"
+import "./bootstrap.min.css";
 import io from "socket.io-client";
 import CreateRoom from "../CreateRoom/CreateRoom";
 import { useNavigate } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
-function ChatRooms() { 
+function ChatRooms() {
   const [isvisible, Setisvisible] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [selectedRoom, setRoom] = useState(""); 
+  const [selectedRoom, setRoom] = useState("");
   const [namespaceSocket, setnamespaceSocket] = useState("");
   const [rooms, setRooms] = useState([]);
 
@@ -22,28 +22,28 @@ function ChatRooms() {
       navigate("/login");
     } else if (selectedRoom) {
       let newnamespaceSocket;
-      if (!selectedRoom.protection) // if no password
-      {
+      if (!selectedRoom.protection) {
+        // if no password
         newnamespaceSocket = io(
           `http://localhost:5000/chat/${selectedRoom.roomName}`,
           { auth: { token: localStorage.getItem("token") } }
         );
-      }
-      else 
-      {
+      } else {
         let pass = prompt("Enter Room Password");
         if (selectedRoom.password === pass) {
           newnamespaceSocket = io(
             `http://localhost:5000/chat/${selectedRoom.roomName}`,
             { auth: { token: localStorage.getItem("token") } }
           );
-        } 
-        else 
-        {
+        } else {
           alert("Wrong password! Please try again.");
           setRoom("");
         }
       }
+
+      newnamespaceSocket.on("RoomCreated", (newRoom) => {
+        setRooms((prevRooms) => [...prevRooms, newRoom]);
+      });
 
       // Listening for incoming messages
       if (newnamespaceSocket) {
@@ -52,15 +52,15 @@ function ChatRooms() {
             ...prevMessages,
             {
               sender: data.from,
-              message: data.message
-            }
+              message: data.message,
+            },
           ]);
         });
         setnamespaceSocket(newnamespaceSocket);
         return () => {
           newnamespaceSocket.disconnect();
           setMessages([]);
-      };
+        };
       }
     }
   }, [selectedRoom]);
@@ -68,12 +68,15 @@ function ChatRooms() {
   // fetch old messages from db
   const fetchMessages = async (roomId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/rooms/${roomId}/messages`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/rooms/${roomId}/messages`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       const data = await response.json();
       console.log("room id: ", roomId);
       setMessages(data); // set the fetched messages
@@ -110,7 +113,7 @@ function ChatRooms() {
   };
 
   const handlelogout = async () => {
-    try { 
+    try {
       const response = await fetch("http://localhost:5000/api/auth/logout", {
         method: "GET",
         headers: {
@@ -128,71 +131,68 @@ function ChatRooms() {
   };
 
   const handleDeleteAccount = async () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     try {
-      const response = await fetch('http://localhost:5000/api/auth/deleteAccount', {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await fetch(
+        "http://localhost:5000/api/auth/deleteAccount",
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
 
       const data = await response.json();
       if (response.ok) {
-        window.location.href = '/login';
+        window.location.href = "/login";
         alert(data.message);
-        localStorage.removeItem('token'); // remove token from localStorage
-      } 
-      else {
-        alert(data.message || 'Failed to delete account');
+        localStorage.removeItem("token"); // remove token from localStorage
+      } else {
+        alert(data.message || "Failed to delete account");
       }
-    } 
-    catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred. Please try again.');
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred. Please try again.");
     }
-};
+  };
 
-  
   const handleRoomCreated = () => {
     Setisvisible(false);
     fetchrooms();
-  }; 
+  };
 
   const togglevisable = () => {
     Setisvisible(!isvisible);
   };
 
-
   return (
     <div className="chat-container">
       <div className="sidebar">
         <div className="top-part">
-        <h2>Chats </h2>
-        <div className="Create-room">
-          <button className="create-btn" onClick={togglevisable}>
-            {isvisible ? "X" : "+"}
-          </button>
-          {isvisible && (
-            <div className="overlay">
-              <div className="overlay-content">
-                
-                <CreateRoom onRoomCreated={handleRoomCreated} />
+          <h2>Chats </h2>
+          <div className="Create-room">
+            <button className="create-btn" onClick={togglevisable}>
+              {isvisible ? "X" : "+"}
+            </button>
+            {isvisible && (
+              <div className="overlay">
+                <div className="overlay-content">
+                  <CreateRoom onRoomCreated={handleRoomCreated} />
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-        </div>
-        
 
-        <ul> 
+        <ul>
           {rooms.map((room) => (
             <li key={room._id}>
               <a
                 href="#"
                 onClick={(e) => {
-                  e.preventDefault(); 
+                  e.preventDefault();
                   setRoom(room);
                   fetchMessages(room._id);
                 }}
@@ -204,40 +204,60 @@ function ChatRooms() {
           ))}
         </ul>
 
-        <input className="del-btn" value="Delete Account" type="button" onClick={handleDeleteAccount } />
-        <input className="logout-btn" value="Log Out" type="button" onClick={handlelogout} />
-            <a href="/Profile"className="pro-btn" > Profile</a>
+        <input
+          className="del-btn"
+          value="Delete Account"
+          type="button"
+          onClick={handleDeleteAccount}
+        />
+        <input
+          className="logout-btn"
+          value="Log Out"
+          type="button"
+          onClick={handlelogout}
+        />
+        <a href="/Profile" className="pro-btn">
+          {" "}
+          Profile
+        </a>
       </div>
       <div className="chat-area coloumn-2">
         {selectedRoom ? (
           <>
             <h3 class="chatroom-title">{selectedRoom.roomName}</h3>
             <div className="chat-messages">
-            {messages.map((msg, index) => { 
-              if (msg.sender && msg.message) { // ensure msg not empty
-                // get current user for msg colors
-                const token = localStorage.getItem('token');
-                let currentUser;
-                if (token) {
+              {messages.map((msg, index) => {
+                if (msg.sender && msg.message) {
+                  // ensure msg not empty
+                  // get current user for msg colors
+                  const token = localStorage.getItem("token");
+                  let currentUser;
+                  if (token) {
                     const decodedToken = jwtDecode(token);
                     currentUser = decodedToken.Uname;
+                  }
+                  let messageClass;
+                  if (msg.sender === currentUser) {
+                    messageClass = "my-message";
+                  } else if (msg.sender === "server") {
+                    messageClass = "server-message";
+                  } else {
+                    messageClass = "other-message";
+                  }
+
+                  return (
+                    <div
+                      key={msg._id}
+                      className={`chat-message ${messageClass}`}
+                    >
+                      <p>
+                        {msg.sender} : {msg.message}
+                      </p>
+                    </div>
+                  );
                 }
-                let messageClass;
-                if (msg.sender === currentUser) { messageClass = "my-message"; } 
-                else if (msg.sender === "server") { messageClass = "server-message"; } 
-                else { messageClass = "other-message"; }
-
-                return (
-                  <div key={msg._id} className={`chat-message ${messageClass}`} >
-                    <p>
-                      {msg.sender} : {msg.message} 
-                    </p>
-                  </div>
-                );
-              }
-              return null; // dont display empty message
-            })}
-
+                return null; // dont display empty message
+              })}
             </div>
             <form className="message-form coloumn" onSubmit={sendMessage}>
               <input
@@ -250,7 +270,9 @@ function ChatRooms() {
           </>
         ) : (
           <>
-            <label className="chatroom-prompt">Please select or create a chatroom to start yapping... </label>
+            <label className="chatroom-prompt">
+              Please select or create a chatroom to start yapping...{" "}
+            </label>
           </>
         )}
       </div>
