@@ -206,6 +206,7 @@ function ChatRooms() {
 
         <input className="del-btn" value="Delete Account" type="button" onClick={handleDeleteAccount } />
         <input className="logout-btn" value="Log Out" type="button" onClick={handlelogout} />
+            <a href="/Profile"className="pro-btn" > Profile</a>
       </div>
       <div className="chat-area coloumn-2">
         {selectedRoom ? (
