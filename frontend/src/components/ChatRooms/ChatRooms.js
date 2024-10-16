@@ -130,6 +130,8 @@ function ChatRooms() {
   return (
     <div className="chat-container">
       <input value="log out" type="button" onClick={handlelogout} />
+    <a href="/Profile"className="pro-btn" > Profile</a>
+        
 
       <div className="sidebar">
         <h2>Chats</h2>
