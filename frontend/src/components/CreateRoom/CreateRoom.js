@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; 
+
+
 function CreateRoom({ onRoomCreated }) {
   const [Room, setRoom] = useState("");
   const [protection, setProtection] = useState(false);
@@ -14,11 +16,15 @@ function CreateRoom({ onRoomCreated }) {
         "content-type": "application/json",
       },
       body: JSON.stringify(RoomData),
+    }).then(response => {
+      if (response.ok) {
+        console.log("Room Created");
+        onRoomCreated(); 
+      }
+      else{
+        console.log("error in chatroon front end")
+      }
     }); 
-    if (response.ok) {
-      console.log("Room Created");
-      onRoomCreated();
-    }
   };
 
   return (
@@ -35,6 +41,7 @@ function CreateRoom({ onRoomCreated }) {
               setRoom(e.target.value);
             }}
           />
+          <label style={{"fontSize": "14px"}} >Create a private room?</label>
           <input
             type="checkbox"
             id="protection"
@@ -45,6 +52,7 @@ function CreateRoom({ onRoomCreated }) {
           />
           {protection && (
             <input
+              style={{"margin": "20px 0"}}
               type="password"
               placeholder="room password"
               value={password}

@@ -12,7 +12,7 @@ body, html {
 }
 
 .sidebar{
-    padding: 20px;
+    padding: 0;
     font-size: 20px;
     background-color: white;
     color: black;
@@ -20,24 +20,64 @@ body, html {
 }
 
 .sidebar h2{
-    font-size: 20px;
+    margin: 20px;
+    font-size: 30px;
     margin-bottom: 20px;
 }
 
 .sidebar ul {
     list-style-type: none;
+    width: 100%;
+    margin: 20px 0;
+    padding: 0;
 }
 
 .sidebar li {
     padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    background-color: wheat;
+    border: 1px solid #fff;
+    background-color: #8c8c8c;
     cursor: pointer;
+    align-content: center;
+}
+
+.sidebar li a {
+    color: white;
+    text-decoration: none;
 }
 
 .sidebar li:hover{
-    background-color: rgb(240, 202, 131);
+    background-color: #C474FC;
+}
+
+.sidebar .logout-btn {
+    position: fixed;
+    bottom: 60px;
+    color: white;
+    width: 150px;
+    margin-left: 4px;
+    margin-bottom: 20px;
+}
+.sidebar .del-btn {
+    position: fixed;
+    bottom: 20px;
+    color: white;
+    width: 150px;
+    margin-left: 4px;
+}
+
+.Create-room .create-btn {
+    margin-left: 20px;
+    width: 30px;
+    height: 30px;
+    border-radius: 20px;
+    padding: 0 0 20px 0;
+    font-size: 24px;
+    margin: 25px 10px 0 0;
+}
+
+.sidebar .top-part {
+    display: flex;
+    margin-top: 20px;
 }
 
 
@@ -48,12 +88,17 @@ body, html {
     background-color: white;
 }
 
+.chatroom-title {
+    margin: 10px;
+}
+
 .chat-messages {
-        padding: 20px;
-        overflow-y: scroll;
-        background-color: #ececec;
-        padding-bottom: 70px;
-    }
+    padding: 20px;
+    overflow-y: scroll;
+    background-color: #fff;
+    padding-bottom: 70px;
+}
+
 .chat-message {
     margin-bottom: 10px;
     background-color: #d9d9d9;
@@ -71,7 +116,7 @@ body, html {
 
 .other-message {
     background-color: #e0e0e0;
-    align-self: flex-end;
+    align-self: flex-end; 
     margin-left: auto;
 }
 
@@ -84,40 +129,37 @@ body, html {
     font-size: 14px;
 }
 
-/*
-.chat-message:nth-child(odd) {
-    background-color: #e0e0e0;
-}
-
-.chat-message:nth-child(even) {
-    background-color: #c0c0c0;
-    align-self: flex-end;
-}*/
-
 
 .message-form{
-    width: 75%;
+    width: 100%;
     position: fixed;
     bottom: 0px;
     display: flex;
     padding:10px;
-    background-color: #c0c0c0;
+    background-color: #e0e0e0;
     border-top: 2px solid #ccc;
 }
 
 .message-form input {
-    padding: 10px;
+    padding: 10px 30px;
     border: none;
     border-radius: 10px;
     font-size: 16px;
     margin-right: 10px;
+    width: 1080px;
 }
 
 .message-form button{
     padding: 10px 15px;
+    width: 200px;
     background-color: white;
     color: black;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.chatroom-prompt {
+    font-size: 20px;
+    margin: 8px;
 }

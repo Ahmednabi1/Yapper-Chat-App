@@ -128,7 +128,7 @@ function ChatRooms() {
   };
 
   const handleDeleteAccount = async () => {
-    const token = localStorage.getItem('token'); // Assuming you have the token saved in localStorage
+    const token = localStorage.getItem('token');
     try {
       const response = await fetch('http://localhost:5000/api/auth/deleteAccount', {
         method: 'DELETE',
@@ -168,24 +168,25 @@ function ChatRooms() {
   return (
     <div className="chat-container">
       <div className="sidebar">
-        <h2>Chats</h2>
+        <div className="top-part">
+        <h2>Chats </h2>
         <div className="Create-room">
-          <button onClick={togglevisable}>
-            {isvisible ? "Close Room Form" : "createRoom"}
+          <button className="create-btn" onClick={togglevisable}>
+            {isvisible ? "X" : "+"}
           </button>
           {isvisible && (
             <div className="overlay">
               <div className="overlay-content">
-                <button className="close-btn" onClick={togglevisable}>
-                  X
-                </button>
+                
                 <CreateRoom onRoomCreated={handleRoomCreated} />
               </div>
             </div>
           )}
         </div>
+        </div>
+        
 
-        <ul>
+        <ul> 
           {rooms.map((room) => (
             <li key={room._id}>
               <a
@@ -203,13 +204,13 @@ function ChatRooms() {
           ))}
         </ul>
 
-        <input value="delete acc" type="button" onClick={handleDeleteAccount } />
-        <input value="log out" type="button" onClick={handlelogout} />
+        <input className="del-btn" value="Delete Account" type="button" onClick={handleDeleteAccount } />
+        <input className="logout-btn" value="Log Out" type="button" onClick={handlelogout} />
       </div>
       <div className="chat-area coloumn-2">
         {selectedRoom ? (
           <>
-            <h3>Room:{selectedRoom.roomName}</h3>
+            <h3 class="chatroom-title">{selectedRoom.roomName}</h3>
             <div className="chat-messages">
             {messages.map((msg, index) => { 
               if (msg.sender && msg.message) { // ensure msg not empty
@@ -248,7 +249,7 @@ function ChatRooms() {
           </>
         ) : (
           <>
-            <p>please select a chatroom to start yapping</p>
+            <label className="chatroom-prompt">Please select or create a chatroom to start yapping... </label>
           </>
         )}
       </div>

@@ -22,6 +22,8 @@ const CreateRoom = async (req, res) => {
       password: protection ? password : null,
     });
     await newRoom.save();
+
+    
     res.status(201).json(newRoom);
   } catch (error) {
     console.error("Error creating room:", error.message);
