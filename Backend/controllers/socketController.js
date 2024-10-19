@@ -1,14 +1,13 @@
 const { Server } = require("socket.io");
 const express = require("express");
-const app = express(); 
-const auth = require("../middleware/authMiddleware");
-const jwt = require("jsonwebtoken");
 const Room = require("../models/Rooms");
-const Message = require('../models/Messages'); 
+const Message = require('../models/Messages');
+const DirectMessage = require('../models/DirectMessages');
+const User = require('../models/User');
+const jwt = require("jsonwebtoken");
 
 
 const socketController = (server) => {
-  // Create a new instance of Socket.IO
   const io = new Server(server, {
     cors: {
       origin: "http://localhost:3000", // React frontend URL
@@ -56,14 +55,14 @@ const socketController = (server) => {
           // save message in database
           try {
             await Message.create({
-                chatroom: room._id,
-                sender: socket.user.Uname,
-                message: msg
+              chatroom: room._id,
+              sender: socket.user.Uname,
+              message: msg,
             });
-            console.log(msg, " Message saved to MongoDB");
-        } catch (error) {
+            
+          } catch (error) {
             console.error("Error saving message to MongoDB:", error.message);
-        }
+          }
         });
 
         socket.on("disconnect", () => {
@@ -75,6 +74,50 @@ const socketController = (server) => {
           delete socket.user.id;
         });
       });
+    });
+  });
+
+  const directMessageNamespace = io.of('/direct');
+
+  directMessageNamespace.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (!token) {
+      return next(new Error("Authentication error"));
+    }
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      socket.user = decoded;
+      next();
+    } catch (err) {
+      return next(new Error("authentication Error"));
+    }
+  });
+
+  directMessageNamespace.on('connection', (socket) => {
+    console.log('User connected for direct messaging:', socket.user.Uname);
+
+    socket.on('direct message', async (data) => {
+      const { to, message } = data;
+
+      directMessageNamespace.to(to).emit('direct message', {
+        sender: socket.user.Uname,
+        message,
+      });
+
+      try {
+        await DirectMessage.create({
+          sender: socket.user.Uname,
+          recipient: to,
+          message: message,
+        });
+        console.log('Direct message saved to database');
+      } catch (error) {
+        console.error("Error saving direct message to MongoDB:", error.message);
+      }
+    });
+
+    socket.on('disconnect', () => {
+      console.log('User disconnected from direct messaging:', socket.user.Uname);
     });
   });
 };

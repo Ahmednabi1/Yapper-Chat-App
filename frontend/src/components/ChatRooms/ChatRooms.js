@@ -3,25 +3,29 @@ import "./ChatRooms.css";
 import "./bootstrap.min.css";
 import io from "socket.io-client";
 import CreateRoom from "../CreateRoom/CreateRoom";
+import UserList from "../UserList/UserList";
+import DirectMessage from "../DirectMessage/DirectMessage"; 
 import { useNavigate } from "react-router-dom";
 
 function ChatRooms() {
-  const [isvisible, Setisvisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [selectedRoom, setRoom] = useState("");
-  const [namespaceSocket, setnamespaceSocket] = useState("");
+  const [namespaceSocket, setNamespaceSocket] = useState("");
   const [rooms, setRooms] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null); 
 
   const navigate = useNavigate();
-  const roomjoin = () => {
-    const newnamespaceSocket = io(
+
+  // Join the selected room and listen for chat messages
+  const roomJoin = () => {
+    const newNamespaceSocket = io(
       `http://localhost:5000/chat/${selectedRoom.roomName}`,
       { auth: { token: localStorage.getItem("token") } }
     );
 
-    // Listening for incoming messages
-    newnamespaceSocket.on("chat message", (data) => {
+    newNamespaceSocket.on("chat message", (data) => {
       setMessages((prevMessages) => [
         ...prevMessages,
         {
@@ -29,34 +33,32 @@ function ChatRooms() {
           message: data.message,
         },
       ]);
-
-      setnamespaceSocket(newnamespaceSocket);
-      return () => {
-        newnamespaceSocket.disconnect();
-        setMessages([]);
-      };
     });
+
+    setNamespaceSocket(newNamespaceSocket);
   };
+
+  // Check for selected room and password protection
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
     } else if (selectedRoom) {
       if (!selectedRoom.protection) {
-        roomjoin();
+        roomJoin();
       } else {
         let pass = prompt("Enter Room Password");
-        if (selectedRoom.password == pass) {
-          roomjoin();
+        if (selectedRoom.password === pass) {
+          roomJoin();
         } else {
-          alert("Wrong password! , try joinning again");
+          alert("Wrong password! Try joining again");
           navigate("/chat");
         }
       }
     }
   }, [selectedRoom]);
 
-  // fetch old messages from db
+  // Fetch old messages from DB
   const fetchMessages = async (roomId) => {
     try {
       const response = await fetch(
@@ -69,18 +71,18 @@ function ChatRooms() {
         }
       );
       const data = await response.json();
-      console.log("room id: ", roomId);
-      setMessages(data); // set the fetched messages
+      setMessages(data);
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
   };
 
+  // Fetch rooms on component mount
   useEffect(() => {
-    fetchrooms();
+    fetchRooms();
   }, []);
 
-  const fetchrooms = async () => {
+  const fetchRooms = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/rooms", {
         method: "GET",
@@ -94,14 +96,18 @@ function ChatRooms() {
       console.error("Error fetching rooms:", error);
     }
   };
+
+  // Handle sending messages
   const sendMessage = (e) => {
     e.preventDefault();
     if (message.trim() && namespaceSocket) {
-      namespaceSocket.emit("chat message", message); // Send message to backend
+      namespaceSocket.emit("chat message", message);
       setMessage("");
     }
   };
-  const handlelogout = async () => {
+
+  // Handle logout
+  const handleLogout = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/auth/logout", {
         method: "POST",
@@ -115,34 +121,37 @@ function ChatRooms() {
         navigate("/login");
       }
     } catch (error) {
-      console.error("error logging out:", error);
+      console.error("Error logging out:", error);
     }
   };
+
+  // Handle room creation
   const handleRoomCreated = () => {
-    Setisvisible(false);
-    fetchrooms();
+    setIsVisible(false);
+    fetchRooms();
   };
 
-  const togglevisable = () => {
-    Setisvisible(!isvisible);
+  const toggleVisible = () => {
+    setIsVisible(!isVisible);
   };
 
   return (
     <div className="chat-container">
-      <input value="log out" type="button" onClick={handlelogout} />
-    <a href="/Profile"className="pro-btn" > Profile</a>
-        
+      <input value="log out" type="button" onClick={handleLogout} />
+      <a href="/Profile" className="pro-btn">
+        Profile
+      </a>
 
       <div className="sidebar">
         <h2>Chats</h2>
         <div className="Create-room">
-          <button onClick={togglevisable}>
-            {isvisible ? "Close Room Form" : "createRoom"}
+          <button onClick={toggleVisible}>
+            {isVisible ? "Close Room Form" : "Create Room"}
           </button>
-          {isvisible && (
+          {isVisible && (
             <div className="overlay">
               <div className="overlay-content">
-                <button className="close-btn" onClick={togglevisable}>
+                <button className="close-btn" onClick={toggleVisible}>
                   X
                 </button>
                 <CreateRoom onRoomCreated={handleRoomCreated} />
@@ -161,46 +170,50 @@ function ChatRooms() {
                   setRoom(room);
                   fetchMessages(room._id);
                 }}
-                className=""
               >
                 {room.roomName}
               </a>
             </li>
           ))}
         </ul>
+        <UserList onSelectUser={(user) => setSelectedUser(user)} />{" "}
       </div>
-      <div className="chat-area coloumn-2">
-        {selectedRoom ? (
+
+      <div className="chat-area column-2">
+        {selectedUser ? (
+          <DirectMessage
+            selectedUser={selectedUser}
+            onBack={() => setSelectedUser(null)}
+          />
+        ) : selectedRoom ? (
           <>
-            <h3>Room:{selectedRoom.roomName}</h3>
+            <h3>Room: {selectedRoom.roomName}</h3>
             <div className="chat-messages">
               {messages.map((msg, index) => {
-                // ensure msg not empty
                 if (msg.sender && msg.message) {
                   return (
-                    <div key={msg._id} className="chat-message">
+                    <div key={index} className="chat-message">
                       <p>
                         {msg.sender} : {msg.message}
                       </p>
                     </div>
                   );
                 }
-                return null; // dont display empty message
+                return null;
               })}
             </div>
-            <form className="message-form coloumn" onSubmit={sendMessage}>
+            <form className="message-form column" onSubmit={sendMessage}>
               <input
+                type="text"
                 value={message}
-                onChange={(e) => setMessage(e.target.value)} // Updated casing for consistency
-                placeholder="Type your message......."
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Type your message..."
               />
               <button type="submit">Send</button>
             </form>
           </>
         ) : (
-          <>
-            <p>please select a chatroom to start yapping</p>
-          </>
+          <h2>Select a room to chat or a user to DM</h2>
         )}
       </div>
     </div>
