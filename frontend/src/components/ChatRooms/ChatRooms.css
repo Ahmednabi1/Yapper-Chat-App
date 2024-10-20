@@ -1,11 +1,4 @@
-
-
-
-
-
-
-
-   body, html {
+body, html {
     padding: 0;
     margin: 0;
     justify-content: center;
@@ -41,30 +34,47 @@
 
 .sidebar ul li {
     margin-bottom: 20px;
+    width: 100%;
+    padding: 10px; 
+    border-radius: 5px; 
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: background-color 0.3s; 
+    cursor: pointer;
 }
 
 .sidebar ul li a {
-    
     color: white;
     text-decoration: none;
     font-size: 20px; 
-    padding: 10px; 
-    border-radius: 5px; 
-    transition: background-color 0.3s; 
-    background-color: rgba(255, 255, 255, 0.2);
 }
 
-.sidebar ul li a:hover {
+.sidebar ul li:hover {
     background-color: rgba(255, 255, 255, 0.4); 
+}
+
+.side-header {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5)
 }
 
 .create-btn {
     background-color: #ffffff;
+    width: 40px;
+    border-radius: 20px;
+    height: 40px;
     border: none;
     color: #C474FC;
-    font-size: 18px;
     cursor: pointer;
     margin: 5px 0;
+}
+
+.create-btn p {
+    font-size: 34px;
+    padding: 0;
+    position: fixed;
+    top: 21px;
 }
 
 .create-btn:hover {
@@ -119,7 +129,7 @@
     color: white;
     padding: 10px;
     border-radius: 10px;
-    margin-left: auto;
+    margin-right: auto;
     width: fit-content;
 }
 
@@ -127,7 +137,7 @@
     background-color: #e0b7ff;
     padding: 10px;
     border-radius: 10px;
-    margin-right: auto;
+    margin-left: auto;
     width: fit-content;
 }
 
@@ -168,12 +178,25 @@
     background-color: white;
     color: #C474FC;
     border: none;
-    padding: 5px; 
-    margin-top: 10px;
-    margin-bottom: 5px; 
+    border-radius: 5px;
+    padding: 5px;
+    margin: 10px 0 10px 7px;
     cursor: pointer;
     text-align: center;
-  
+    position: fixed;
+    width: 240px;
+}
+
+.del-btn {
+    bottom: 20px;
+}
+
+.logout-btn {
+    bottom: 60px;
+}
+
+.pro-btn {
+    bottom: 100px;
 }
 
 .del-btn:hover, .logout-btn:hover, .pro-btn:hover {

@@ -171,11 +171,15 @@ function ChatRooms() {
     <div className="chat-container">
       <div className="sidebar">
         <div className="top-part">
+
+          <div className="side-header">
           <h2>Chats </h2>
           <div className="Create-room">
             <button className="create-btn" onClick={togglevisable}>
-              {isvisible ? "X" : "+"}
+              <p>{isvisible ? "X" : "+"}</p>
             </button>
+          </div>
+          
             {isvisible && (
               <div className="overlay">
                 <div className="overlay-content">
