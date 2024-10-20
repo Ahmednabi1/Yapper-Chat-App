@@ -38,15 +38,22 @@ function ChatRooms() {
         } else {
           alert("Wrong password! Please try again.");
           setRoom("");
+          return;
         }
       }
 
-      newnamespaceSocket.on("RoomCreated", (newRoom) => {
-        setRooms((prevRooms) => [...prevRooms, newRoom]);
-      });
-
-      // Listening for incoming messages
+      
       if (newnamespaceSocket) {
+
+        // hereee
+        newnamespaceSocket.removeAllListeners();
+
+
+        newnamespaceSocket.on("RoomCreated", (newRoom) => {
+          setRooms((prevRooms) => [...prevRooms, newRoom]);
+        });
+
+        // Listening for incoming messages
         newnamespaceSocket.on("chat message", (data) => {
           setMessages((prevMessages) => [
             ...prevMessages,
@@ -56,7 +63,9 @@ function ChatRooms() {
             },
           ]);
         });
+
         setnamespaceSocket(newnamespaceSocket);
+        
         return () => {
           newnamespaceSocket.disconnect();
           setMessages([]);
