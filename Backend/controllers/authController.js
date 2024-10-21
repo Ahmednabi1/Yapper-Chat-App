@@ -2,23 +2,24 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Message = require("../models/Messages");
-
+//function to generate the access token and the payload is the User email
 const generateAccessToken = (Uname) => {
   return jwt.sign({ Uname }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
-
+//register api 
 const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body; //gets the email and password from the response 
 
   try {
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ email }); //check if the email is alreade exists 
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
 
+  //encryption for the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    user = new User({ email, password: hashedPassword });
+    user = new User({ email, password: hashedPassword }); //add new user to database
     await user.save();
 
     res.status(201).json({ message: "User registered successfully" });
@@ -42,6 +43,7 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "password doesn't match" });
     }
 
+    //generate the token with the email in the payload
     const token = generateAccessToken(user.email);
     res.json({ token });
   } catch (error) {
