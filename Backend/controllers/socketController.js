@@ -15,19 +15,19 @@ const socketController = async (server) => {
       methods: ["GET", "POST"],
     },
   });
-
+//Function for Creating namespace for the room
   const createnamespace = (room) => {
-    const ns = io.of("/chat/" + room.roomName);
+    const ns = io.of("/chat/" + room.roomName); //namespace is the /chat/roomname
     ns.use((socket, next) => {
-      const token = socket.handshake.auth.token;
-      if (!token) {
+      const token = socket.handshake.auth.token; //handshake the token to check it
+      if (!token) { //if no token provided
         console.error("Token not provided");
         return next(new Error("Authentication error: Token not provided"));
       }
       try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);// validate the token
         console.log(decoded);
-        socket.user = decoded;
+        socket.user = decoded; //make the socket user to be the data of the logeed in user
         next();
       } catch (err) {
         console.error("Token verification failed:", err.message);
@@ -35,16 +35,16 @@ const socketController = async (server) => {
       }
     });
 
-    ns.on("connection", (socket) => {
-      ns.emit("chat message", {
+    ns.on("connection", (socket) => { //when connected to the room namespace the user gets a socket  
+      ns.emit("chat message", { //server emits that the user joined
         from: "server",
         message: `${socket.user.Uname} has joined`,
       });
       console.log(
         "a user connected:" + `${socket.user.Uname}` + ` to : ${room.roomName}`
       );
-
-      socket.on("chat message", async (msg) => {
+      
+      socket.on("chat message", async (msg) => { //waiting for the chat message event
         let data = {
           from: socket.user.Uname,
           message: msg,
@@ -65,7 +65,7 @@ const socketController = async (server) => {
         }
       });
 
-      socket.on("disconnect", () => {
+      socket.on("disconnect", () => { //when socket disconnects from the namespace
         console.log("user disconnected:", socket.user.Uname);
         ns.emit("chat message", {
           from: "server",
@@ -76,12 +76,12 @@ const socketController = async (server) => {
     });
   };
 
-  const rooms = await Room.find();
-  rooms.forEach(createnamespace);
+  const rooms = await Room.find(); //retrive the rooms from database 
+  rooms.forEach(createnamespace); //create namespace for all rooms in the database
 
-  eventEmitter.on("RoomCreated", (newRoom) => {
-    io.emit("RoomCreated", newRoom);
-    createnamespace(newRoom);
+  eventEmitter.on("RoomCreated", (newRoom) => { // wait for the roomcreated event from the roomController
+    io.emit("RoomCreated", newRoom); //emeits event to the frontend that a new room created
+    createnamespace(newRoom); //create a new namespace for the newroom created
   });
 };
 
