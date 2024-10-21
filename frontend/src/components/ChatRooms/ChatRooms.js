@@ -8,27 +8,30 @@ import { jwtDecode } from "jwt-decode";
 
 function ChatRooms() {
   const [isvisible, Setisvisible] = useState(false);
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState(""); //new message 
+  const [messages, setMessages] = useState([]); //old messages
   const [selectedRoom, setRoom] = useState("");
   const [namespaceSocket, setnamespaceSocket] = useState("");
-  const [rooms, setRooms] = useState([]);
+  const [rooms, setRooms] = useState([]); //the old rooms
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   useEffect(() => {
+   //check if user logged in
+
+
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
-    } else if (selectedRoom) {
-      let newnamespaceSocket;
-      if (!selectedRoom.protection) {
+    } else if (selectedRoom) { //if there is a selected room
+      let newnamespaceSocket; 
+      if (!selectedRoom.protection) {//check if room is not protected
         // if no password
-        newnamespaceSocket = io(
+        newnamespaceSocket = io( //connects to the namespace 
           `http://localhost:5000/chat/${selectedRoom.roomName}`,
           { auth: { token: localStorage.getItem("token") } }
         );
-      } else {
+      } else { //if room is protected 
         let pass = prompt("Enter Room Password");
         if (selectedRoom.password === pass) {
           newnamespaceSocket = io(
@@ -45,12 +48,14 @@ function ChatRooms() {
       
       if (newnamespaceSocket) {
 
-        // hereee
-        newnamespaceSocket.removeAllListeners();
+        
+        //if user connected to namespace
+        newnamespaceSocket.removeAllListeners();  
 
 
+       //waiting for a new room creation
         newnamespaceSocket.on("RoomCreated", (newRoom) => {
-          setRooms((prevRooms) => [...prevRooms, newRoom]);
+          setRooms((prevRooms) => [...prevRooms, newRoom]); //add the new room to the rooms array
         });
 
         // Listening for incoming messages
@@ -97,7 +102,7 @@ function ChatRooms() {
   useEffect(() => {
     fetchrooms();
   }, []);
-
+//get the rooms from the backend
   const fetchrooms = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/rooms", {
